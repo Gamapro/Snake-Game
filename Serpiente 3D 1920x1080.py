@@ -165,7 +165,7 @@ class Snake:
 
 # Init
 pygame.init()
-width, height = 370, 370 
+width, height = 580, 580
 real_width, real_height = width*3+40, height+80
 screen = pygame.display.set_mode((real_width,real_height))
 pygame.display.set_caption('Snake Game') 
@@ -193,15 +193,15 @@ screen.fill(background)
 
 # INTRO
 
-font = pygame.font.Font('freesansbold.ttf', 62)
+font = pygame.font.Font('freesansbold.ttf', 72)
 text = font.render('SNAKE GAME', True, colorV, background)
 textRect = text.get_rect()
-textRect.center = (textX, 80)
+textRect.center = (textX, 100)
 
 fontIntro = pygame.font.Font('freesansbold.ttf', 50)
 textIntro = fontIntro.render('PRESS INTRO TO CONTINUE', True, colorV, background)
 textRectIntro = textIntro.get_rect()
-textRectIntro.center = (textX, 150)
+textRectIntro.center = (textX, 300)
 
 fontControls = pygame.font.Font('freesansbold.ttf', 50)
 textControls = fontControls.render('Controls', True, colorV, background)

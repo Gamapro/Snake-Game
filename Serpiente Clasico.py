@@ -3,8 +3,6 @@ import numpy as np
 import time
 import threading
 
-vivo = True
-
 class Food():
     
     def __init__(self,ocupadas):
@@ -36,6 +34,9 @@ class Snake:
     def getState(self):
         return self.vals
 
+    def getSize(self):
+        return len(self.vals)
+
     def new_direction(self,new_direction):
         #self.direction = new_direction
         if self.direction == 0 and new_direction != 1:   # Norte
@@ -60,28 +61,28 @@ class Snake:
         for x in range(ncx):
             for y in range(ncy):
                 coord = [
-                    (x * dimCX, y * dimCY),
-                    ((x+1) * dimCX, y * dimCY),
-                    ((x+1) * dimCX, (y+1) * dimCY),
-                    (x * dimCX, (y+1) * dimCY)
+                    (round(x * dimCX),round(y * dimCY)),
+                    (round((x+1) * dimCX),round(y * dimCY)),
+                    (round((x+1) * dimCX),round((y+1) * dimCY)),
+                    (round(x * dimCX),round((y+1) * dimCY))
                 ]
                 pygame.draw.polygon(screen,colorM,coord,1)
 
         for x,y,direction in self.vals:
             coord = [
-                (x * dimCX, y * dimCY),
-                ((x+1) * dimCX, y * dimCY),
-                ((x+1) * dimCX, (y+1) * dimCY),
-                (x * dimCX, (y+1) * dimCY)
+                (round(x * dimCX),round(y * dimCY)),
+                (round((x+1) * dimCX),round(y * dimCY)),
+                (round((x+1) * dimCX),round((y+1) * dimCY)),
+                (round(x * dimCX),round((y+1) * dimCY))
             ]
             pygame.draw.polygon(screen,colorV,coord,0)
 
         x,y = actFood.posx, actFood.posy
         coord = [
-            (x * dimCX, y * dimCY),
-            ((x+1) * dimCX, y * dimCY),
-            ((x+1) * dimCX, (y+1) * dimCY),
-            (x * dimCX, (y+1) * dimCY)
+            (round(x * dimCX),round(y * dimCY)),
+            (round((x+1) * dimCX),round(y * dimCY)),
+            (round((x+1) * dimCX),round((y+1) * dimCY)),
+            (round(x * dimCX),round((y+1) * dimCY))
         ]
         pygame.draw.polygon(screen,colorF,coord)
     
@@ -92,10 +93,10 @@ class Snake:
         if (x,y) == actFood.getXY():
             delta = 0
             coord = [
-                (x * dimCX, y * dimCY),
-                ((x+1) * dimCX, y * dimCY),
-                ((x+1) * dimCX, (y+1) * dimCY),
-                (x * dimCX, (y+1) * dimCY)
+                (round(x * dimCX),round(y * dimCY)),
+                (round((x+1) * dimCX),round(y * dimCY)),
+                (round((x+1) * dimCX),round((y+1) * dimCY)),
+                (round(x * dimCX),round((y+1) * dimCY))
             ]
             pygame.draw.polygon(screen,colorV,coord,0)
             actFood = Food(self.getState())
@@ -129,23 +130,76 @@ class Snake:
 # Init
 pygame.init()
 width, height = 600, 600
-screen = pygame.display.set_mode((width,height))
+screen = pygame.display.set_mode((width,height+80))
+pygame.display.set_caption('Snake Game') 
+vivo = True
 
 # Background :v
 background = (25, 25, 25)
 screen.fill(background)
-
-ncx, ncy = 20, 20                      # Num de celdas en x y y
-dimCX, dimCY = width/ncx , height/ncy  # Ancho de los cuadrados
+ncx, ncy = 20, 20                           # Num de celdas en x, y, z
+dimCX, dimCY = width/ncx , height/ncy       # Ancho de los cuadrados
 colorM, colorV, colorF = (128, 128, 128), (255,255,255), (255,0,0)
 
 # Estado de las celdas
-#gameState = np.random.randint(2,size=(ncx,ncy))
-gameState = np.zeros((ncx,ncy))
-gameState[ncx//2,ncy//2] = 1
 snk = Snake(ncx//2,ncy//2)
 actFood = Food(snk.getState())
-speed = 20  # 20 ms
+speed, rate = 20, 3.5
+keyState = [0,0,0,0,0,0]
+
+# Text
+textX, textY = width // 2, height + 40
+font = pygame.font.Font('freesansbold.ttf', 32)
+screen.fill(background)
+
+# INTRO
+
+font = pygame.font.Font('freesansbold.ttf', 72)
+text = font.render('SNAKE GAME', True, colorV, background)
+textRect = text.get_rect()
+textRect.center = (textX, 100)
+
+fontIntro = pygame.font.Font('freesansbold.ttf', 40)
+textIntro = fontIntro.render('PRESS INTRO TO CONTINUE', True, colorV, background)
+textRectIntro = textIntro.get_rect()
+textRectIntro.center = (textX, 300)
+
+fontControls = pygame.font.Font('freesansbold.ttf', 40)
+textControls = fontControls.render('Controls', True, colorV, background)
+textRectControls = textControls.get_rect()
+textRectControls.center = (textX, textY-150)
+
+fontControls2 = pygame.font.Font('freesansbold.ttf', 16)
+textControls2 = fontControls2.render('NORTH         SOUTH             LEFT             RIGHT             UP        DOWN', True, colorV, background)
+textRectControls2 = textControls2.get_rect()
+textRectControls2.center = (textX, textY-80)
+
+fontControls3 = pygame.font.Font('freesansbold.ttf', 16)
+textControls3 = fontControls3.render('UP_KEY    DOWN_KEY    LEFT_KEY    RIGHT_KEY    W_KEY    S_KEY', True, colorV, background)
+textRectControls3 = textControls3.get_rect()
+textRectControls3.center = (textX, textY-40)
+
+screen.blit(text, textRect) 
+screen.blit(textIntro, textRectIntro) 
+screen.blit(textControls, textRectControls) 
+screen.blit(textControls2, textRectControls2) 
+screen.blit(textControls3, textRectControls3) 
+
+pygame.display.flip()
+   
+while True:
+
+    pygame.time.delay(speed)
+
+    e = pygame.event.get()
+    for event in e:
+        if event.type == pygame.QUIT: run = False
+
+    keys = pygame.key.get_pressed()
+    
+    if keys[pygame.K_RETURN]:
+        break
+
 
 def checar():
     while vivo:
@@ -181,26 +235,47 @@ t.start()
 while vivo:
 
     screen.fill(background) # Limpiar el CANVAS
-    #pygame.time.delay(50)
-    #time.sleep(1)
+    pygame.time.delay(int(speed*rate))
 
-    pygame.time.delay(speed*5)
-
-    """
-        mouseClick = pygame.mouse.get_pressed()
-        sum = 0
-        for x in mouseClick:
-            sum+=x
-        if sum > 0:
-            posX, posY = pygame.mouse.get_pos()
-            celX, celY = int(np.floor(posX/dimCX)), int(np.floor(posY / dimCY))
-            aux[celX,celY] = not mouseClick[2]
-    """
+    text = font.render('Score:'+str(snk.getSize()), True, colorV, background)
+    textRect = text.get_rect()
+    textRect.center = (textX, textY)
 
     snk.show(ncx,ncy,actFood)
+    screen.blit(text, textRect) 
+    
     actFood, vivo = snk.update(ncx,ncy,actFood,vivo)
-
     pygame.display.flip()
 
-wait = input("PRESS ENTER TO CONTINUE.")
+
+
+font = pygame.font.Font('freesansbold.ttf', 32)
+text = font.render('Final Score: '+str(snk.getSize()), True, colorV, background)
+textRect = text.get_rect()
+textRect.center = (textX, textY-18)
+
+text2 = font.render("PRESS ENTER TO EXIT.", True, colorV, background)
+textRect2 = text2.get_rect()
+textRect2.center = (textX, textY+18)
+
+screen.fill(background)
+snk.show(ncx,ncy,actFood)
+screen.blit(text, textRect)
+screen.blit(text2, textRect2)
+pygame.display.flip()
+
+print("PRESS ENTER TO CONTINUE.")
+while True:
+    e = pygame.event.get()
+    for event in e:
+        if event.type == pygame.QUIT: run = False
+
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_RETURN]:
+        break
+
+
 pygame.quit()
+
+
